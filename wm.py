@@ -5,6 +5,7 @@ import config
 
 display = Display()
 root = display.screen().root
+root.change_attributes(event_mask=X.SubstructureRedirectMask)
 
 root.grab_key(display.keysym_to_keycode(XK.string_to_keysym("F1")), X.Mod1Mask, 1,
         X.GrabModeAsync, X.GrabModeAsync)
@@ -18,6 +19,18 @@ root.grab_key(display.keysym_to_keycode(XK.string_to_keysym("t")), X.Mod1Mask, 1
 start = None
 while 1:
     event = display.next_event()
+    if event.type == X.MapRequest:
+        event.window.map()
+    elif event.type == X.ConfigureRequest:
+        window = event.window
+        window.configure(
+            x=event.x,
+            y=event.y,
+            width=event.width,
+            height=event.height,
+            border_width=event.border_width,
+            stack_mode=event.stack_mode
+        )
     if event.type == X.KeyPress:
         keysym = display.keycode_to_keysym(event.detail, 0)
 
